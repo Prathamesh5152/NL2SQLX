@@ -1,5 +1,5 @@
 from sqlalchemy.sql import text
-from db import engine
+from backend.db import engine
 
 def run_sql(sql: str):
     with engine.connect() as conn:
