@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 from rag import rag_store
-from backend.validator import clean_sql, is_safe_sql, ensure_groupby_safe
+from validator import clean_sql, is_safe_sql, ensure_groupby_safe
 
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))

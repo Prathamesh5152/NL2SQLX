@@ -1,16 +1,16 @@
 from fastapi import FastAPI, UploadFile, File
-from backend.schema_extractor import extract_schema
-from backend.validator import clean_sql, is_safe_sql, ensure_groupby_safe
+from schema_extractor import extract_schema
+from validator import clean_sql, is_safe_sql, ensure_groupby_safe
 
-from backend.sql_runner import run_sql
-from backend.nl2sql import generate_sql
-from backend.db import engine  # <-- ADD THIS
+from sql_runner import run_sql
+from nl2sql import generate_sql
+from db import engine  # <-- ADD THIS
 import pandas as pd
 from sqlalchemy import text
-from backend.schema_extractor import extract_schema
-from backend.nl2sql import generate_sql
-from backend.sql_runner import run_sql
-from backend.db import engine
+from schema_extractor import extract_schema
+from nl2sql import generate_sql
+from sql_runner import run_sql
+from db import engine
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 

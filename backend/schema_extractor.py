@@ -1,7 +1,7 @@
 # backend/schema_extractor.py
 from sqlalchemy import inspect, text
-from backend.db import engine
-from backend.rag import rag_store
+from db import engine
+from rag import rag_store
 import pandas as pd
 
 def extract_schema():
