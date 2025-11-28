@@ -1,45 +1,43 @@
 # backend/rag.py
 
-from chromadb import Client
-from chromadb.config import Settings
+from chromadb import PersistentClient
 
-# Create in-memory ChromaDB store
-client = Client(Settings(chroma_db_impl="duckdb+memory"))
+# Use an in-memory temporary folder at runtime
+client = PersistentClient(path="/tmp/chroma-db")
 
-# Create or reset schema collection
+# Create / Get collection
 collection = client.get_or_create_collection("schema_chunks")
 
+
 def reset_rag_store():
-    """Clear all stored vectors before reloading schema."""
+    """Clear the existing schema collection."""
+    global collection
     try:
         client.delete_collection("schema_chunks")
     except:
         pass
 
-    # Recreate empty collection
-    global collection
-    collection = client.create_collection("schema_chunks")
+    collection = client.get_or_create_collection("schema_chunks")
+
 
 def add_schema_chunk(chunk_id: str, text: str):
-    """Add a schema description to vector DB."""
+    """Insert schema text chunk into vector DB."""
     collection.add(
         ids=[chunk_id],
         documents=[text]
     )
 
+
 def rag_search(query: str):
-    """Return the closest schema text for the query."""
+    """Retrieve relevant schema chunks."""
     result = collection.query(
         query_texts=[query],
         n_results=3
     )
 
-    if (
-        result and
-        "documents" in result and
-        result["documents"]
-    ):
-        docs = result["documents"][0]
+    docs = result.get("documents", [[]])[0]
+
+    if docs:
         return "\n\n".join(docs)
 
     return ""
