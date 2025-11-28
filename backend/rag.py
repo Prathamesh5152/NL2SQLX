@@ -38,7 +38,7 @@ def add_schema_chunks(chunks):
         add_schema_chunk(c)
 
 
-def rag_search(query, top_k=3):
+def rag_search(query, n=3):
     """
     vector search
     """
