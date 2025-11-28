@@ -2,7 +2,9 @@
 import os
 from dotenv import load_dotenv
 from groq import Groq
-from rag import rag_store
+from rag import rag_search
+
+
 from validator import clean_sql, is_safe_sql, ensure_groupby_safe
 
 load_dotenv()
@@ -60,7 +62,7 @@ def generate_sql(user_query: str, schema_snapshot: dict, top_k: int = 6) -> str:
     4) Clean and validate SQL
     """
     # 1. retrieve
-    retrieved = rag_store.search(user_query, top_k=top_k)
+    retrieved = rag_search(user_query, top_k=top_k)
 
     # 2. prompt
     prompt = build_prompt(user_query, retrieved, schema_snapshot)

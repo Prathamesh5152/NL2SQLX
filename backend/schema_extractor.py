@@ -4,6 +4,7 @@ from sqlalchemy import inspect, text
 from db import engine
 from rag import add_schema_chunk, reset_rag_store
 
+
 def extract_schema():
     """
     Extract the MySQL schema and push table descriptions into RAG.
