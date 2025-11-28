@@ -1,0 +1,12 @@
+{
+  "name": "nl2sqlx-fullstack",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently -k \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "uvicorn app:app --reload --app-dir backend",
+    "start:frontend": "cd frontend && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
