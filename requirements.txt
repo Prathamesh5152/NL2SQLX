@@ -1,7 +1,10 @@
 fastapi
 uvicorn
+pandas
 sqlalchemy
 pymysql
 python-dotenv
-openai
-pydantic
+groq
+numpy
+scikit-learn
+python-multipart
