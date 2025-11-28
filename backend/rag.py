@@ -1,78 +1,45 @@
 # backend/rag.py
-import os
-import pickle
-from typing import List
-import numpy as np
-import faiss
-from sentence_transformers import SentenceTransformer
 
-INDEX_PATH = os.path.join(os.path.dirname(__file__), "faiss_index.bin")
-META_PATH = os.path.join(os.path.dirname(__file__), "faiss_meta.pkl")
-EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
-EMBED_DIM = 384  # model embedding dim
+from chromadb import Client
+from chromadb.config import Settings
 
-class RAGStore:
-    def __init__(self):
-        self.model = SentenceTransformer(EMBED_MODEL_NAME)
-        self.index = None
-        self.metadata = []  # list[str] parallel to index vectors
-        self._ensure_index_loaded()
+# Create in-memory ChromaDB store
+client = Client(Settings(chroma_db_impl="duckdb+memory"))
 
-    def _ensure_index_loaded(self):
-        if os.path.exists(INDEX_PATH) and os.path.exists(META_PATH):
-            try:
-                self.index = faiss.read_index(INDEX_PATH)
-                with open(META_PATH, "rb") as f:
-                    self.metadata = pickle.load(f)
-                # sanity: ensure dims match
-                if self.index.d != EMBED_DIM:
-                    self._recreate_index()
-            except Exception:
-                self._recreate_index()
-        else:
-            self._recreate_index()
+# Create or reset schema collection
+collection = client.get_or_create_collection("schema_chunks")
 
-    def _recreate_index(self):
-        self.index = faiss.IndexFlatL2(EMBED_DIM)
-        self.metadata = []
-        self.save()
+def reset_rag_store():
+    """Clear all stored vectors before reloading schema."""
+    try:
+        client.delete_collection("schema_chunks")
+    except:
+        pass
 
-    def add_chunk(self, text: str):
-        """Add a single text chunk (schema or example) to index."""
-        emb = self.model.encode([text], show_progress_bar=False)
-        emb = np.array(emb, dtype="float32")
-        self.index.add(emb)
-        self.metadata.append(text)
-        self.save()
+    # Recreate empty collection
+    global collection
+    collection = client.create_collection("schema_chunks")
 
-    def add_chunks(self, texts: List[str]):
-        if not texts:
-            return
-        embs = self.model.encode(texts, show_progress_bar=False)
-        embs = np.array(embs, dtype="float32")
-        self.index.add(embs)
-        self.metadata.extend(texts)
-        self.save()
+def add_schema_chunk(chunk_id: str, text: str):
+    """Add a schema description to vector DB."""
+    collection.add(
+        ids=[chunk_id],
+        documents=[text]
+    )
 
-    def search(self, query: str, top_k: int = 5) -> List[str]:
-        """Return top_k text chunks relevant to query."""
-        if self.index.ntotal == 0:
-            return []
-        q_emb = self.model.encode([query], show_progress_bar=False).astype("float32")
-        distances, indices = self.index.search(q_emb, top_k)
-        out = []
-        for idx in indices[0]:
-            if idx < len(self.metadata):
-                out.append(self.metadata[idx])
-        return out
+def rag_search(query: str):
+    """Return the closest schema text for the query."""
+    result = collection.query(
+        query_texts=[query],
+        n_results=3
+    )
 
-    def save(self):
-        faiss.write_index(self.index, INDEX_PATH)
-        with open(META_PATH, "wb") as f:
-            pickle.dump(self.metadata, f)
+    if (
+        result and
+        "documents" in result and
+        result["documents"]
+    ):
+        docs = result["documents"][0]
+        return "\n\n".join(docs)
 
-    def clear(self):
-        self._recreate_index()
-
-# single global instance used by app
-rag_store = RAGStore()
+    return ""

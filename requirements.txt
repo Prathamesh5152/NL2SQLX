@@ -8,3 +8,4 @@ groq
 numpy
 scikit-learn
 python-multipart
+chromadb
