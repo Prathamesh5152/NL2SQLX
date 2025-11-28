@@ -1,43 +1,28 @@
-# backend/rag.py
+from chromadb import Client
+from chromadb.config import Settings
+import numpy as np
 
-from chromadb import PersistentClient
-
-# Use an in-memory temporary folder at runtime
-client = PersistentClient(path="/tmp/chroma-db")
-
-# Create / Get collection
-collection = client.get_or_create_collection("schema_chunks")
-
+client = Client(Settings())
+collection = client.get_or_create_collection("schema_vectors")
 
 def reset_rag_store():
-    """Clear the existing schema collection."""
-    global collection
-    try:
-        client.delete_collection("schema_chunks")
-    except:
-        pass
+    collection.delete(where={})
 
-    collection = client.get_or_create_collection("schema_chunks")
-
-
-def add_schema_chunk(chunk_id: str, text: str):
-    """Insert schema text chunk into vector DB."""
+def add_schema_chunk(text):
     collection.add(
-        ids=[chunk_id],
-        documents=[text]
+        documents=[text],
+        ids=[str(np.random.randint(1e12))]
     )
 
-
-def rag_search(query: str):
-    """Retrieve relevant schema chunks."""
-    result = collection.query(
+def rag_search(query, top_k=3):   # 👈 FIXED HERE
+    """
+    Return top_k relevant schema chunks.
+    """
+    results = collection.query(
         query_texts=[query],
-        n_results=3
+        n_results=top_k
     )
 
-    docs = result.get("documents", [[]])[0]
-
-    if docs:
-        return "\n\n".join(docs)
-
-    return ""
+    if "documents" in results and results["documents"]:
+        return results["documents"][0]
+    return []
