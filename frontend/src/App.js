@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+"use client";
 
 // Use deployed backend URL
 const API_BASE = "https://nl2sqlx.onrender.com";

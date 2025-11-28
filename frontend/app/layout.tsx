@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-
+import './ignore-console-errors.js'
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'NL2SQLX Dashboard',
+  description: 'Natural Language to SQL Learning Platform',
+  generator: 'NL2SQLX – Convert Natural Language to SQL Instantly',
   icons: {
     icon: [
       {
@@ -42,4 +42,7 @@ export default function RootLayout({
       </body>
     </html>
   )
+}
+if (typeof window !== "undefined") {
+  console.error = () => {};
 }
