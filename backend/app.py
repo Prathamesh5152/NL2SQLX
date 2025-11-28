@@ -13,10 +13,9 @@ from sql_runner import run_sql
 from db import engine
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],     # for development
+    allow_origins=["*"],  # allow all domains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -130,3 +129,9 @@ def finish_session():
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    
+
+@app.get("/")
+def home():
+    return {"status": "Backend running", "cors": "enabled"}
+

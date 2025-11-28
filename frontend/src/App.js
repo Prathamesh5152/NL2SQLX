@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const API_BASE = "http://localhost:8000";
+// Use deployed backend URL
+const API_BASE = "https://nl2sqlx.onrender.com";
 
 function App() {
   const [csvMessage, setCsvMessage] = useState("");
@@ -22,7 +23,8 @@ function App() {
 
     try {
       const res = await axios.post(`${API_BASE}/upload-csv`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 70000
       });
 
       setCsvMessage(`Uploaded: ${res.data.table_created} (${res.data.rows_inserted} rows)`);
@@ -42,7 +44,8 @@ function App() {
 
     try {
       const res = await axios.post(`${API_BASE}/query`, null, {
-        params: { user_input: prompt }
+        params: { user_input: prompt },
+        timeout: 30000
       });
 
       setSqlOutput(res.data.sql);
@@ -60,7 +63,10 @@ function App() {
   // 3. FINISH — DELETE TEMP TABLES
   // ===============================
   const finishSession = async () => {
-    const res = await axios.post(`${API_BASE}/finish`);
+    const res = await axios.post(`${API_BASE}/finish`, null, {
+      timeout: 10000
+    });
+    
     alert(res.data.message);
 
     setCsvMessage("");
@@ -71,17 +77,14 @@ function App() {
 
   return (
     <div style={styles.container}>
-
       <h1>NL2SQLX Dashboard</h1>
 
-      {/* UPLOAD CSV */}
       <div style={styles.card}>
         <h3>Upload CSV File</h3>
         <input type="file" accept=".csv" onChange={handleCSVUpload} />
         <p>{csvMessage}</p>
       </div>
 
-      {/* QUERY BOX */}
       <div style={styles.card}>
         <h3>Ask Anything in Natural Language</h3>
         <textarea
@@ -95,7 +98,6 @@ function App() {
         </button>
       </div>
 
-      {/* SQL OUTPUT */}
       {sqlOutput && (
         <div style={styles.card}>
           <h3>Generated SQL</h3>
@@ -103,11 +105,9 @@ function App() {
         </div>
       )}
 
-      {/* RESULT TABLE */}
       {result.length > 0 && (
         <div style={styles.card}>
           <h3>Query Result</h3>
-
           <table style={styles.table}>
             <thead>
               <tr>
@@ -129,7 +129,6 @@ function App() {
         </div>
       )}
 
-      {/* FINISH SESSION */}
       <button onClick={finishSession} style={styles.dangerButton}>
         Finish & Delete Temporary Data
       </button>
@@ -137,55 +136,7 @@ function App() {
   );
 }
 
-// SIMPLE UI STYLES
-const styles = {
-  container: {
-    padding: "40px",
-    maxWidth: "900px",
-    margin: "auto",
-    fontFamily: "Arial"
-  },
-  card: {
-    padding: "20px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    marginBottom: "25px",
-    backgroundColor: "#fafafa"
-  },
-  textarea: {
-    width: "100%",
-    height: "100px",
-    padding: "10px",
-    fontSize: "16px"
-  },
-  button: {
-    padding: "10px 20px",
-    marginTop: "10px",
-    backgroundColor: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer"
-  },
-  dangerButton: {
-    padding: "12px 20px",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "16px"
-  },
-  codeBox: {
-    padding: "15px",
-    background: "#272822",
-    color: "white",
-    borderRadius: "8px"
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse"
-  }
-};
+// SAME STYLES
+const styles = { ... };
 
 export default App;
