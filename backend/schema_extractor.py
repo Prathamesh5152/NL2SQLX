@@ -65,7 +65,7 @@ def extract_schema():
         )
 
         # --- Push chunk into RAG vector DB ---
-        add_schema_chunk(table, chunk)
+        add_schema_chunk(table)
 
     # Return schema dict for API
     return schema
