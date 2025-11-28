@@ -73,42 +73,49 @@ NL2SQLX/
 cd backend
 python -m venv venv
 venv/Scripts/activate   # Windows
-###2️⃣ Install requirements
-pip install -r requirements.txt
+```
+## 🛠️ Run Backend Locally
 
+### 2️⃣ Install requirements
+```bash
+pip install -r requirements.txt
+```
 ###3️⃣ Create .env file inside backend
+```
 MYSQL_USER=root
 MYSQL_PASSWORD=xxxx
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
 MYSQL_DB=mydb
 OPENAI_API_KEY=your_key
-
+```
 ###4️⃣ Run FastAPI
 uvicorn app:app --reload
-
+```
 ###🎨 Run Frontend Locally (React/Next.js)
 cd frontend
 npm install
 npm run dev
 
-
+```
 Frontend runs on:
 
 http://localhost:3000
-
-
+```
+```
 Backend runs on:
 
 http://localhost:8000
-
-
+```
+```
 Edit API_BASE inside frontend:
 
 export const API_BASE = "http://localhost:8000";
 
-
+```
+```
 ###👨‍💻 About the Developer
 
 Prathamesh Shivaji Salokhe
 B.Tech Computer Engineering (Final Year)
+```
